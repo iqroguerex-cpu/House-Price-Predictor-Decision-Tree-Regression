@@ -7,13 +7,10 @@ import matplotlib.pyplot as plt
 # -----------------------------
 # PAGE CONFIG
 # -----------------------------
-st.set_page_config(
-    page_title="House Price Dashboard",
-    layout="wide"
-)
+st.set_page_config(page_title="House Price Predictor", layout="wide")
 
 # -----------------------------
-# LOAD DATA (CACHED)
+# LOAD DATA (SAFE)
 # -----------------------------
 @st.cache_data
 def load_data():
@@ -22,7 +19,7 @@ def load_data():
 dataset = load_data()
 
 # -----------------------------
-# LOAD MODEL (CACHED)
+# LOAD MODEL (SAFE)
 # -----------------------------
 @st.cache_resource
 def load_model():
@@ -30,27 +27,24 @@ def load_model():
 
 model = load_model()
 
-X = dataset.iloc[:, :-1]
-y = dataset.iloc[:, -1]
-
 # -----------------------------
 # TITLE
 # -----------------------------
 st.title("🏠 House Price Prediction Dashboard")
-st.markdown("Predict house prices using Machine Learning")
+st.write("Simple ML app to estimate house prices")
 
 st.write("---")
 
 # -----------------------------
 # SIDEBAR INPUTS
 # -----------------------------
-st.sidebar.header("Enter House Details")
+st.sidebar.header("Input Features")
 
-area = st.sidebar.slider("Area (sq ft)", 500, 4000, 2000)
-bedrooms = st.sidebar.slider("Bedrooms", 1, 5, 3)
-bathrooms = st.sidebar.slider("Bathrooms", 1, 3, 2)
-stories = st.sidebar.slider("Stories", 1, 2, 1)
-parking = st.sidebar.slider("Parking", 0, 2, 1)
+area = st.sidebar.number_input("Area (sq ft)", 500, 4000, 2000)
+bedrooms = st.sidebar.number_input("Bedrooms", 1, 5, 3)
+bathrooms = st.sidebar.number_input("Bathrooms", 1, 3, 2)
+stories = st.sidebar.number_input("Stories", 1, 2, 1)
+parking = st.sidebar.number_input("Parking", 0, 2, 1)
 
 # -----------------------------
 # PREDICTION
@@ -64,46 +58,48 @@ st.success(f"₹ {int(prediction[0]):,}")
 st.write("---")
 
 # -----------------------------
-# CHARTS (OPTIMIZED)
+# LIGHTWEIGHT CHARTS
 # -----------------------------
+st.subheader("📊 Data Insights")
+
 col1, col2 = st.columns(2)
 
-# 📊 Area vs Price
+# Chart 1: Area vs Price
 with col1:
-    st.subheader("📊 Area vs Price")
     fig1, ax1 = plt.subplots()
     ax1.scatter(dataset["area"], dataset["price"])
     ax1.set_xlabel("Area")
     ax1.set_ylabel("Price")
+    ax1.set_title("Area vs Price")
     st.pyplot(fig1)
 
-# 📈 Prediction vs Actual (SAMPLED for speed)
+# Chart 2: Feature Importance
 with col2:
-    st.subheader("📈 Prediction vs Actual")
-
-    sample = dataset.sample(500, random_state=1)  # 🔥 key fix
-    X_sample = sample.iloc[:, :-1]
-    y_sample = sample.iloc[:, -1]
-
-    y_pred_sample = model.predict(X_sample)
+    importance = model.feature_importances_
+    features = dataset.columns[:-1]
 
     fig2, ax2 = plt.subplots()
-    ax2.scatter(y_sample, y_pred_sample)
-    ax2.set_xlabel("Actual")
-    ax2.set_ylabel("Predicted")
+    ax2.bar(features, importance)
+    ax2.set_title("Feature Importance")
+    plt.xticks(rotation=45)
     st.pyplot(fig2)
 
 # -----------------------------
-# FEATURE IMPORTANCE
+# OPTIONAL: SAMPLE PREDICTION GRAPH (SAFE)
 # -----------------------------
-st.subheader("🌳 Feature Importance")
+st.subheader("📈 Model Behavior (Sampled)")
 
-importance = model.feature_importances_
-features = X.columns
+sample = dataset.sample(300, random_state=1)
+
+X_sample = sample.iloc[:, :-1]
+y_sample = sample.iloc[:, -1]
+y_pred = model.predict(X_sample)
 
 fig3, ax3 = plt.subplots()
-ax3.bar(features, importance)
-plt.xticks(rotation=45)
+ax3.scatter(y_sample, y_pred)
+ax3.set_xlabel("Actual Price")
+ax3.set_ylabel("Predicted Price")
+ax3.set_title("Prediction vs Actual")
 
 st.pyplot(fig3)
 
@@ -111,4 +107,4 @@ st.pyplot(fig3)
 # FOOTER
 # -----------------------------
 st.write("---")
-st.caption("Built with ❤️ using Streamlit & Machine Learning")
+st.caption("Built with Streamlit • Decision Tree Regression")
