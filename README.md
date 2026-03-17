@@ -10,7 +10,7 @@
 ## 🚀 Live Demo
 
 👉 **Try the app here:**
-🔗 https://your-streamlit-app-link.streamlit.app
+🔗 https://fwl8cs9vxdalqkegdjdbf5.streamlit.app/
 
 ---
 
