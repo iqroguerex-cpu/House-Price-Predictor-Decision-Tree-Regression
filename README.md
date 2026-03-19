@@ -154,4 +154,4 @@ This project is open-source and available under the MIT License.
 
 ## ⭐ Support
 
-If you found this helpful, please ⭐ the repo!.
+If you found this helpful, please ⭐ the repo!
